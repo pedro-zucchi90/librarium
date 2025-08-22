@@ -1,7 +1,66 @@
-backend/node_modules
-
+# Ignorar arquivos e pastas do Node.js
+backend/node_modules/
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
 backend/package-lock.json
-
 backend/.env
+backend/.env.*
+backend/.DS_Store
+backend/dist/
+backend/build/
+backend/.pnp
+backend.pnp.js
+backend/coverage/
+backend/.nyc_output/
+backend/.eslintcache
 
+# Ignorar arquivos e pastas do Flutter/Dart
+librarium/.dart_tool/
+librarium/.packages
+librarium/.flutter-plugins
+librarium/.flutter-plugins-dependencies
+librarium/.metadata
+librarium/.idea/
+librarium/.vscode/
+librarium/build/
+librarium/web/build/
+librarium/ios/Flutter/Flutter.framework
+librarium/ios/Flutter/Flutter.podspec
+librarium/ios/ServiceDefinitions.json
+librarium/ios/Runner.xcworkspace/
+librarium/ios/Pods/
+librarium/ios/Podfile.lock
+librarium/ios/Flutter/App.framework
+librarium/ios/Flutter/engine/
+librarium/ios/Flutter/Generated.xcconfig
+librarium/ios/Flutter/ephemeral/
+librarium/android/.gradle/
+librarium/android/app/build/
+librarium/android/build/
+librarium/android/local.properties
+librarium/pubspec.lock
+librarium/.DS_Store
+
+# Ignorar arquivos sensíveis ou de dados
 librarium/data/*
+librarium/.env
+librarium/.env.*
+
+# Ignorar arquivos gerados pelo Flutter no build/flutter_assets
+librarium/build/flutter_assets/AssetManifest.bin
+librarium/build/flutter_assets/AssetManifest.bin.json
+librarium/build/flutter_assets/AssetManifest.json
+librarium/build/flutter_assets/FontManifest.json
+librarium/build/flutter_assets/NOTICES
+librarium/build/flutter_assets/MaterialIcons-Regular.otf
+librarium/build/flutter_assets/CupertinoIcons.ttf
+librarium/build/flutter_assets/ink_sparkle.frag
+
+# Outros arquivos de sistema
+*.iml
+*.swp
+*.swo
+*.tmp
+*.log
+.DS_Store
