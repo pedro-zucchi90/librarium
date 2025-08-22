@@ -1,11 +1,10 @@
-# Ignorar arquivos e pastas do Node.js
+# Node.js
 backend/node_modules/
 backend/npm-debug.log*
 backend/yarn-debug.log*
 backend/yarn-error.log*
 backend/package-lock.json
 backend/.env
-backend/.env.*
 backend/.DS_Store
 backend/dist/
 backend/build/
@@ -15,7 +14,7 @@ backend/coverage/
 backend/.nyc_output/
 backend/.eslintcache
 
-# Ignorar arquivos e pastas do Flutter/Dart
+# Flutter/Dart
 librarium/.dart_tool/
 librarium/.packages
 librarium/.flutter-plugins
@@ -42,25 +41,25 @@ librarium/android/local.properties
 librarium/pubspec.lock
 librarium/.DS_Store
 
-# Ignorar arquivos sensíveis ou de dados
+# Sensíveis ou dados
 librarium/data/*
 librarium/.env
 librarium/.env.*
 
-# Ignorar arquivos gerados pelo Flutter no build/flutter_assets
-librarium/build/flutter_assets/AssetManifest.bin
-librarium/build/flutter_assets/AssetManifest.bin.json
-librarium/build/flutter_assets/AssetManifest.json
-librarium/build/flutter_assets/FontManifest.json
-librarium/build/flutter_assets/NOTICES
-librarium/build/flutter_assets/MaterialIcons-Regular.otf
-librarium/build/flutter_assets/CupertinoIcons.ttf
-librarium/build/flutter_assets/ink_sparkle.frag
-
-# Outros arquivos de sistema
-*.iml
+# Outros
+*.class
+*.pyc
 *.swp
-*.swo
 *.tmp
 *.log
 .DS_Store
+*.iml
+.vscode/
+.idea/
+.fvm/
+coverage/
+.nyc_output/
+node_modules/
+jspm_packages/
+*.tgz
+.yarn-integrity
