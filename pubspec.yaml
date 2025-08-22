@@ -1,0 +1,46 @@
+name: librarium
+description: Um app para gerenciar hábitos e construir uma vida melhor.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # UI e componentes
+  cupertino_icons: ^1.0.2
+  
+  # Estado e gerenciamento
+  provider: ^6.0.5
+  
+  # Banco de dados local
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  
+  # Armazenamento local
+  shared_preferences: ^2.2.2
+  
+  # HTTP e API
+  http: ^1.1.0
+  
+  # Utilitários
+  intl: ^0.18.1
+  uuid: ^4.0.0
+  
+  # Notificações
+  flutter_local_notifications: ^16.3.0
+  
+  # Ícones
+  flutter_svg: ^2.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
