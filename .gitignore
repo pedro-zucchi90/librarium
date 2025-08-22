@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Miscellaneous
 *.class
 *.log
@@ -148,3 +149,12 @@ jspm_packages/
 
 # dotenv environment variables file
 .env
+=======
+backend/node_modules
+
+backend/package-lock.json
+
+backend/.env
+
+librarium/data/*
+>>>>>>> 8988faa242431b332c7cc7a9ea3b480603ba035f
