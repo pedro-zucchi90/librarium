@@ -55,10 +55,8 @@ JWT_SECRET=sua_chave_secreta_super_forte_aqui
 JWT_EXPIRES_IN=7d
 FRONTEND_URL=http://localhost:3001
 GOOGLE_CLIENT_ID=seu_google_client_id_aqui
-GOOGLE_CLIENT_SECRET=seu_google_client_secret_aqui
 ```
 
-**💡 Dica**: O sistema usa automaticamente o `GOOGLE_CLIENT_ID` para notificações push!
 
 4. **Inicie o servidor**
 ```bash
@@ -217,20 +215,11 @@ MONGODB_URI=mongodb://localhost:27017/librarium
 JWT_SECRET=sua_chave_secreta_jwt_aqui
 
 # Google APIs (OAuth2)
-# IMPORTANTE: Para integrações funcionarem, você PRECISA de ambos:
 GOOGLE_CLIENT_ID=seu_google_client_id_aqui
-GOOGLE_CLIENT_SECRET=seu_google_client_secret_aqui
-
-# Notificações Push
-# Se não fornecidas, as chaves VAPID serão geradas automaticamente
-PUSH_PUBLIC_KEY=sua_chave_publica_vapid_aqui
-PUSH_PRIVATE_KEY=sua_chave_privada_vapid_aqui
 ```
 
 **⚠️ IMPORTANTE sobre Google APIs:**
-- Para as integrações com Google Calendar e Google Fit funcionarem, você **PRECISA** de ambos `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`
-- Se você só tem o Client ID, essas funcionalidades não funcionarão
-- As notificações push funcionarão independentemente das Google APIs
+- Para as integrações com Google Calendar e Google Fit funcionarem, você **PRECISA** do `GOOGLE_CLIENT_ID`
 
 ## 🧪 Testando a API
 
@@ -289,10 +278,6 @@ npm run dev
 3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
 4. Push para a branch (`git push origin feature/nova-feature`)
 5. Abra um Pull Request
-
-## 📄 Licença
-
-MIT License - veja o arquivo LICENSE para detalhes.
 
 ---
 

@@ -40,6 +40,7 @@ librarium/android/build/
 librarium/android/local.properties
 librarium/pubspec.lock
 librarium/.DS_Store
+Librarium/build/*
 
 # Sensíveis ou dados
 librarium/data/*
