@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import 'habit_screen.dart';
 import 'stats_screen.dart';
 import 'profile_screen.dart';
+import 'achievement_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -13,13 +14,19 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
   final _authService = MockAuthService();
+  late List<Widget> _screens;
 
-  final List<Widget> _screens = [
-    _DashboardContent(),
-    HabitScreen(),
-    StatsScreen(),
-    ProfileScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      _DashboardContent(onTabChanged: (index) => setState(() => _currentIndex = index)),
+      HabitScreen(),
+      StatsScreen(),
+      AchievementScreen(),
+      ProfileScreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +52,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: AppStrings.statistics,
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.emoji_events),
+            label: 'Conquistas',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: AppStrings.profile,
           ),
@@ -54,7 +65,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-class _DashboardContent extends StatelessWidget {
+class _DashboardContent extends StatefulWidget {
+  final Function(int) onTabChanged;
+  
+  const _DashboardContent({required this.onTabChanged});
+  
+  @override
+  _DashboardContentState createState() => _DashboardContentState();
+}
+
+class _DashboardContentState extends State<_DashboardContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -201,6 +221,73 @@ class _DashboardContent extends StatelessWidget {
                     ],
                   ),
                 ],
+              ),
+            ),
+            SizedBox(height: AppSizes.paddingLarge),
+
+            // Seção de Conquistas
+            GestureDetector(
+              onTap: () {
+                widget.onTabChanged(3); // Navegar para a tela de conquistas
+              },
+              child: Container(
+                padding: EdgeInsets.all(AppSizes.paddingMedium),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFFC0A060), // Dourado envelhecido
+                      Color(0xFFD4AF37), // Dourado nobre
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFFC0A060).withOpacity(0.3),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.emoji_events,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                    SizedBox(width: AppSizes.paddingMedium),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Conquistas Desbloqueadas',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            '3 de 8 relíquias',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ],
+                ),
               ),
             ),
             SizedBox(height: AppSizes.paddingLarge),
