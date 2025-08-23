@@ -112,7 +112,7 @@ class _HabitScreenState extends State<HabitScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Confirmar exclusão'),
-        content: Text('Tem certeza que deseja excluir o hábito "${habit.title}"?'),
+        content: Text('Tem certeza que deseja excluir o hábito "${habit.titulo}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -178,30 +178,34 @@ class _HabitCard extends StatelessWidget {
       child: ListTile(
         leading: IconButton(
           icon: Icon(
-            habit.isActive ? Icons.check_circle : Icons.radio_button_unchecked,
-            color: habit.isActive ? AppColors.success : Colors.grey,
+            habit.ativo ? Icons.check_circle : Icons.radio_button_unchecked,
+            color: habit.ativo ? AppColors.success : Colors.grey,
           ),
           onPressed: onToggle,
         ),
         title: Text(
-          habit.title,
+          habit.titulo,
           style: TextStyle(
             fontWeight: FontWeight.w500,
-            decoration: !habit.isActive ? TextDecoration.lineThrough : null,
+            decoration: !habit.ativo ? TextDecoration.lineThrough : null,
           ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(habit.description),
+            Text(habit.descricao),
             SizedBox(height: 4),
+            // Frequência
             Text(
-              '${habit.frequency}x por semana',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.primary,
-                fontWeight: FontWeight.w500,
-              ),
+              'Frequência: ${habit.frequencia}',
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 8),
+
+            // Dias da semana
+            Text(
+              'Dias da semana: ${habit.diasSemana.join(', ')}',
+              style: TextStyle(fontSize: 16),
             ),
           ],
         ),
@@ -412,16 +416,28 @@ class _AddHabitDialogState extends State<_AddHabitDialog> {
     }
 
           final habit = habit_models.Habit(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      userId: '1', // Simulando usuário logado
-      title: _titleController.text.trim(),
-      description: _descriptionController.text.trim(),
-      category: _categoryController.text,
-      frequency: _frequency,
-      daysOfWeek: _selectedDays,
-      reminderTime: habit_models.TimeOfDay(hour: 9, minute: 0),
-      createdAt: DateTime.now(),
-    );
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            idUsuario: '1', // Simulando usuário logado
+            titulo: _titleController.text.trim(),
+            descricao: _descriptionController.text.trim(),
+            categoria: _categoryController.text,
+            frequencia: _frequency.toString(), // Convertendo int para String
+            diasSemana: _selectedDays,
+            horarioLembrete: habit_models.TimeOfDay(hour: 9, minute: 0),
+            createdAt: DateTime.now(),
+            dificuldade: 'medio', // Defina a dificuldade padrão ou obtenha de outro campo se necessário
+            recompensaExperiencia: 10,
+            icone: 'star',
+            cor: '#8B0000',
+            ativo: true,
+            sequencia: habit_models.Sequencia(atual: 0, maiorSequencia: 0),
+            estatisticas: habit_models.Estatisticas(
+              totalConclusoes: 0,
+              totalPerdidos: 0,
+              taxaConclusao: 0.0,
+            ),
+            notificacoes: true,
+          );
 
     widget.onHabitCreated(habit);
   }
@@ -435,20 +451,29 @@ class _HabitDetailsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(habit.title),
+      title: Text(habit.titulo),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Descrição: ${habit.description}'),
+          Text('Descrição: ${habit.descricao}'),
           SizedBox(height: AppSizes.paddingSmall),
-          Text('Categoria: ${habit.category}'),
+          Text('Categoria: ${habit.categoria}'),
           SizedBox(height: AppSizes.paddingSmall),
-          Text('Frequência: ${habit.frequency}x por semana'),
+          // Frequência
+          Text(
+            'Frequência: ${habit.frequencia}',
+            style: TextStyle(fontSize: 16),
+          ),
+          SizedBox(height: 8),
+
+          // Dias da semana
+          Text(
+            'Dias da semana: ${habit.diasSemana.join(', ')}',
+            style: TextStyle(fontSize: 16),
+          ),
           SizedBox(height: AppSizes.paddingSmall),
-          Text('Dias: ${habit.daysOfWeek.join(', ')}'),
-          SizedBox(height: AppSizes.paddingSmall),
-          Text('Status: ${habit.isActive ? 'Ativo' : 'Inativo'}'),
+          Text('Status: ${habit.ativo ? 'Ativo' : 'Inativo'}'),
           SizedBox(height: AppSizes.paddingSmall),
           Text('Criado em: ${habit.createdAt.day}/${habit.createdAt.month}/${habit.createdAt.year}'),
         ],

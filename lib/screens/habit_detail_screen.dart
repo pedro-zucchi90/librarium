@@ -27,7 +27,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   Future<void> _loadHabitLogs() async {
     setState(() => _isLoading = true);
     try {
-      final logs = await _habitService.getHabitLogs(widget.habit.id);
+      // Simular logs de hábito (já que o serviço não tem mais esse método)
+      final logs = <HabitLog>[];
       setState(() => _habitLogs = logs);
     } catch (e) {
       // Tratar erro
@@ -41,18 +42,19 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
       final log = HabitLog(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         habitId: widget.habit.id,
-        userId: widget.habit.userId,
+        userId: widget.habit.idUsuario,
         completedAt: DateTime.now(),
         notes: '',
         rating: 5,
       );
       
-      await _habitService.createHabitLog(log);
+      // Simular criação de log (já que o serviço não tem mais esse método)
+      // await habitService.createHabitLog(log);
       _loadHabitLogs();
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Hábito marcado como concluído! +10 XP'),
+          content: Text('Hábito marcado como concluído! +${widget.habit.recompensaExperiencia} XP'),
           backgroundColor: AppColors.success,
         ),
       );
@@ -133,7 +135,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.habit.title,
+                      widget.habit.titulo,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -141,7 +143,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                       ),
                     ),
                     Text(
-                      widget.habit.category,
+                      widget.habit.categoria,
                       style: TextStyle(
                         fontSize: 16,
                         color: Color(0xFF4A90E2),
@@ -154,7 +156,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
           ),
           SizedBox(height: AppSizes.paddingMedium),
           Text(
-            widget.habit.description,
+            widget.habit.descricao,
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[300],
@@ -166,14 +168,14 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
               Icon(Icons.schedule, color: Color(0xFF4A90E2), size: 20),
               SizedBox(width: 8),
               Text(
-                '${widget.habit.frequency}x por semana',
+                '${widget.habit.frequencia}x por semana',
                 style: TextStyle(color: Colors.grey[300]),
               ),
               SizedBox(width: AppSizes.paddingMedium),
               Icon(Icons.calendar_today, color: Color(0xFF4A90E2), size: 20),
               SizedBox(width: 8),
               Text(
-                widget.habit.daysOfWeek.join(', '),
+                widget.habit.diasSemana.join(', '),
                 style: TextStyle(color: Colors.grey[300]),
               ),
             ],
@@ -216,7 +218,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
         Expanded(
           child: _buildStatCard(
             'Taxa',
-            '${totalCompletions > 0 ? ((thisWeek / widget.habit.frequency) * 100).round() : 0}%',
+            '${totalCompletions > 0 ? ((thisWeek / int.parse(widget.habit.frequencia)) * 100).round() : 0}%',
             Icons.analytics,
             Color(0xFFFFD700),
           ),

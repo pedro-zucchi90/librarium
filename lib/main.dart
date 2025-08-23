@@ -11,8 +11,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Librarium',
-              theme: AppTheme.darkTheme,
-        home: SplashScreen(),
+      theme: AppTheme.darkTheme,
+      home: SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
