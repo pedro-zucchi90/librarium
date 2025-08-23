@@ -35,7 +35,7 @@ const esquemaHabito = new mongoose.Schema({
   },
   recompensaExperiencia: {
     type: Number,
-    default: function() {
+    default: function () {
       const recompensas = { facil: 10, medio: 20, dificil: 35, lendario: 50 };
       return recompensas[this.dificuldade] || 20;
     }
@@ -74,13 +74,13 @@ const esquemaHabito = new mongoose.Schema({
 });
 
 // Calcular taxa de conclusão
-esquemaHabito.methods.atualizarEstatisticas = function() {
+esquemaHabito.methods.atualizarEstatisticas = function () {
   const total = this.estatisticas.totalConclusoes + this.estatisticas.totalPerdidos;
   this.estatisticas.taxaConclusao = total > 0 ? (this.estatisticas.totalConclusoes / total) * 100 : 0;
 };
 
 // Atualizar sequência
-esquemaHabito.methods.atualizarSequencia = function(concluido) {
+esquemaHabito.methods.atualizarSequencia = function (concluido) {
   if (concluido) {
     this.sequencia.atual += 1;
     if (this.sequencia.atual > this.sequencia.maiorSequencia) {

@@ -48,7 +48,6 @@ router.post('/registrar', async (req, res) => {
         avatar: novoUsuario.avatar
       }
     });
-
   } catch (erro) {
     console.error('Erro no registro:', erro);
     res.status(500).json({
@@ -103,7 +102,6 @@ router.post('/login', async (req, res) => {
         ultimaAtividade: usuario.ultimaAtividade
       }
     });
-
   } catch (erro) {
     console.error('Erro no login:', erro);
     res.status(500).json({
@@ -135,7 +133,6 @@ router.get('/perfil', autenticarUsuario, async (req, res) => {
         ultimaAtividade: usuario.ultimaAtividade
       }
     });
-
   } catch (erro) {
     console.error('Erro ao obter perfil:', erro);
     res.status(500).json({
@@ -190,7 +187,6 @@ router.put('/perfil', autenticarUsuario, async (req, res) => {
         preferencias: usuario.preferencias
       }
     });
-
   } catch (erro) {
     console.error('Erro ao atualizar perfil:', erro);
     res.status(500).json({

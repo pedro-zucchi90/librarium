@@ -117,7 +117,7 @@ router.post('/importar', async (req, res) => {
 
     res.json({
       sucesso: true,
-      mensagem: '📦 Dados importados/restaurados com sucesso! (simulação)',
+      mensagem: '📦 Dados importados/restaurados com sucesso! (simulação)'
     });
   } catch (erro) {
     console.error('Erro ao importar dados:', erro);
@@ -136,9 +136,9 @@ router.get('/dashboard', async (req, res) => {
     hoje.setHours(0, 0, 0, 0);
 
     // Buscar hábitos ativos
-    const habitosAtivos = await Habito.find({ 
-      idUsuario: usuario._id, 
-      ativo: true 
+    const habitosAtivos = await Habito.find({
+      idUsuario: usuario._id,
+      ativo: true
     });
 
     // Buscar progresso de hoje
@@ -153,8 +153,8 @@ router.get('/dashboard', async (req, res) => {
     const porcentagemConclusao = totalHabitos > 0 ? (habitosConcluidos / totalHabitos) * 100 : 0;
 
     // Buscar conquistas recentes
-    const conquistasRecentes = await Conquista.find({ 
-      idUsuario: usuario._id 
+    const conquistasRecentes = await Conquista.find({
+      idUsuario: usuario._id
     }).sort({ desbloqueadaEm: -1 }).limit(3);
 
     res.json({
@@ -185,7 +185,6 @@ router.get('/dashboard', async (req, res) => {
         conquistasRecentes
       }
     });
-
   } catch (erro) {
     console.error('Erro ao carregar dashboard:', erro);
     res.status(500).json({
@@ -245,9 +244,9 @@ router.get('/estatisticas', async (req, res) => {
     });
 
     // Sequência atual e histórico
-    const habitosAtivos = await Habito.find({ 
-      idUsuario: usuario._id, 
-      ativo: true 
+    const habitosAtivos = await Habito.find({
+      idUsuario: usuario._id,
+      ativo: true
     });
 
     const sequencias = habitosAtivos.map(habito => ({
@@ -278,7 +277,6 @@ router.get('/estatisticas', async (req, res) => {
         }
       }
     });
-
   } catch (erro) {
     console.error('Erro ao carregar estatísticas:', erro);
     res.status(500).json({
@@ -321,7 +319,6 @@ router.get('/ranking', async (req, res) => {
         experiencia: req.usuario.experiencia
       }
     });
-
   } catch (erro) {
     console.error('Erro ao carregar ranking:', erro);
     res.status(500).json({
@@ -334,8 +331,8 @@ router.get('/ranking', async (req, res) => {
 // Obter conquistas do usuário
 router.get('/conquistas', async (req, res) => {
   try {
-    const conquistas = await Conquista.find({ 
-      idUsuario: req.usuario._id 
+    const conquistas = await Conquista.find({
+      idUsuario: req.usuario._id
     }).sort({ desbloqueadaEm: -1 });
 
     const conquistasPorRaridade = {
@@ -354,7 +351,6 @@ router.get('/conquistas', async (req, res) => {
         porRaridade: conquistasPorRaridade
       }
     });
-
   } catch (erro) {
     console.error('Erro ao carregar conquistas:', erro);
     res.status(500).json({
@@ -387,7 +383,6 @@ router.put('/preferencias', async (req, res) => {
       mensagem: '⚙️ Preferências atualizadas com sucesso!',
       preferencias: usuario.preferencias
     });
-
   } catch (erro) {
     console.error('Erro ao atualizar preferências:', erro);
     res.status(500).json({

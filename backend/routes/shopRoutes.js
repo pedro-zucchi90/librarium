@@ -9,7 +9,7 @@ const lojaItens = [
   { id: 'skin1', nome: 'Manto Sombrio', tipo: 'armadura', precoXP: 100 },
   { id: 'skin2', nome: 'Espada Fantasma', tipo: 'arma', precoXP: 150 },
   { id: 'skin3', nome: 'Amuleto Abissal', tipo: 'acessorio', precoXP: 80 },
-  { id: 'skin4', nome: 'Manto Lendário', tipo: 'armadura', precoXP: 300 },
+  { id: 'skin4', nome: 'Manto Lendário', tipo: 'armadura', precoXP: 300 }
 ];
 
 // Listar itens disponíveis na loja

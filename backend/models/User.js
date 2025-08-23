@@ -8,7 +8,7 @@ const esquemaUsuario = new mongoose.Schema({
     unique: true,
     trim: true,
     minlength: [3, 'Nome de usuário deve ter pelo menos 3 caracteres'],
-    maxlength: [20, 'Nome de usuário deve ter no máximo 20 caracteres']
+    maxlength: [25, 'Nome de usuário deve ter no máximo 25 caracteres'] // Aumentado de 20 para 25
   },
   email: {
     type: String,
@@ -68,12 +68,12 @@ const esquemaUsuario = new mongoose.Schema({
 });
 
 // Calcular nível baseado na experiência
-esquemaUsuario.virtual('nivelCalculado').get(function() {
+esquemaUsuario.virtual('nivelCalculado').get(function () {
   return Math.floor(this.experiencia / 100) + 1; // 100 XP por nível
 });
 
 // Obter título baseado no nível
-esquemaUsuario.virtual('tituloCalculado').get(function() {
+esquemaUsuario.virtual('tituloCalculado').get(function () {
   const nivel = this.nivelCalculado;
   if (nivel >= 31) {
     return 'Conjurador Supremo';
@@ -88,11 +88,11 @@ esquemaUsuario.virtual('tituloCalculado').get(function() {
 });
 
 // Criptografar senha antes de salvar
-esquemaUsuario.pre('save', async function(next) {
+esquemaUsuario.pre('save', async function (next) {
   if (!this.isModified('senha')) {
     return next();
   }
-  
+
   try {
     const sal = await bcrypt.genSalt(12);
     this.senha = await bcrypt.hash(this.senha, sal);
@@ -103,10 +103,10 @@ esquemaUsuario.pre('save', async function(next) {
 });
 
 // Atualizar nível e título baseado na experiência
-esquemaUsuario.pre('save', function(next) {
+esquemaUsuario.pre('save', function (next) {
   this.nivel = this.nivelCalculado;
   this.titulo = this.tituloCalculado;
-  
+
   // Atualizar avatar baseado no nível
   if (this.nivel >= 31) {
     this.avatar = 'conjurador';
@@ -117,23 +117,23 @@ esquemaUsuario.pre('save', function(next) {
   } else {
     this.avatar = 'aspirante';
   }
-  
+
   next();
 });
 
 // Método para comparar senha
-esquemaUsuario.methods.compararSenha = async function(senhaCandidata) {
+esquemaUsuario.methods.compararSenha = async function (senhaCandidata) {
   return bcrypt.compare(senhaCandidata, this.senha);
 };
 
 // Método para adicionar experiência
-esquemaUsuario.methods.adicionarExperiencia = function(quantidade) {
+esquemaUsuario.methods.adicionarExperiencia = function (quantidade) {
   this.experiencia += quantidade;
   return this.save();
 };
 
 // Atualizar última atividade
-esquemaUsuario.methods.atualizarUltimaAtividade = function() {
+esquemaUsuario.methods.atualizarUltimaAtividade = function () {
   this.ultimaAtividade = new Date();
   return this.save();
 };

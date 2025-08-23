@@ -32,7 +32,7 @@ Backend do Librarium, um gerenciador de hábitos gamificado com temática dark f
 
 1. **Clone o repositório**
 ```bash
-git clone <seu-repositorio>
+git clone https://github.com/seu-usuario/librarium.git
 cd librarium/backend
 ```
 
@@ -54,7 +54,11 @@ MONGODB_URI=mongodb://localhost:27017/librarium
 JWT_SECRET=sua_chave_secreta_super_forte_aqui
 JWT_EXPIRES_IN=7d
 FRONTEND_URL=http://localhost:3001
+GOOGLE_CLIENT_ID=seu_google_client_id_aqui
+GOOGLE_CLIENT_SECRET=seu_google_client_secret_aqui
 ```
+
+**💡 Dica**: O sistema usa automaticamente o `GOOGLE_CLIENT_ID` para notificações push!
 
 4. **Inicie o servidor**
 ```bash
@@ -192,11 +196,41 @@ npm start
 
 ## 🔒 Segurança
 
-- Senhas criptografadas com bcrypt (salt 12)
-- Tokens JWT com expiração configurável
-- Rate limiting (100 requests/15min por IP)
-- Helmet para headers de segurança
-- Validação de entrada em todos os endpoints
+- **JWT**: Autenticação baseada em tokens
+- **bcrypt**: Hash seguro de senhas
+- **Helmet**: Headers de segurança HTTP
+- **Rate Limiting**: Proteção contra abuso da API
+- **CORS**: Configurado para integração com Flutter
+- **Validação**: Sanitização de entrada com express-validator
+
+## ⚙️ Configuração
+
+### Variáveis de Ambiente
+
+Copie o arquivo `env.example` para `.env` e configure:
+
+```bash
+# Banco de Dados
+MONGODB_URI=mongodb://localhost:27017/librarium
+
+# JWT
+JWT_SECRET=sua_chave_secreta_jwt_aqui
+
+# Google APIs (OAuth2)
+# IMPORTANTE: Para integrações funcionarem, você PRECISA de ambos:
+GOOGLE_CLIENT_ID=seu_google_client_id_aqui
+GOOGLE_CLIENT_SECRET=seu_google_client_secret_aqui
+
+# Notificações Push
+# Se não fornecidas, as chaves VAPID serão geradas automaticamente
+PUSH_PUBLIC_KEY=sua_chave_publica_vapid_aqui
+PUSH_PRIVATE_KEY=sua_chave_privada_vapid_aqui
+```
+
+**⚠️ IMPORTANTE sobre Google APIs:**
+- Para as integrações com Google Calendar e Google Fit funcionarem, você **PRECISA** de ambos `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`
+- Se você só tem o Client ID, essas funcionalidades não funcionarão
+- As notificações push funcionarão independentemente das Google APIs
 
 ## 🧪 Testando a API
 

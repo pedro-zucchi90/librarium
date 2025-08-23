@@ -1,88 +1,250 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
-require('dotenv').config();
+const path = require('path');
 
+// Importar configurações
 const conectarBancoDados = require('./config/db');
-const rotasAuth = require('./routes/authRoutes');
-const rotasHabitos = require('./routes/habitRoutes');
-const rotasUsuarios = require('./routes/userRoutes');
-const rotasEstatisticas = require('./routes/statsRoutes');
-const rotasLoja = require('./routes/shopRoutes');
-const rotasMultiplayer = require('./routes/multiplayerRoutes');
-const rotasIntegracao = require('./routes/integrationRoutes');
+const logger = require('./utils/logger');
+
+// Importar rotas
+const authRoutes = require('./routes/authRoutes');
+const habitRoutes = require('./routes/habitRoutes');
+const userRoutes = require('./routes/userRoutes');
+const statsRoutes = require('./routes/statsRoutes');
+const shopRoutes = require('./routes/shopRoutes');
+const multiplayerRoutes = require('./routes/multiplayerRoutes');
+const integrationRoutes = require('./routes/integrationRoutes');
+const achievementRoutes = require('./routes/achievementRoutes');
+const dataRoutes = require('./routes/dataRoutes');
+
+// Importar serviços
+const AchievementService = require('./services/achievementService');
+
+// Importar middlewares
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware de segurança
-app.use(helmet());
+// ===== CONFIGURAÇÕES DE SEGURANÇA =====
 
-// Limitação de taxa
-const limitador = rateLimit({
-  windowMs: process.env.RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000, // 15 minutos
-  max: process.env.RATE_LIMIT_MAX_REQUESTS || 100, // limitar cada IP a 100 requisições por janela
-  message: {
-    erro: 'Muitas tentativas',
-    mensagem: '⚔️ Você está fazendo muitas requisições. Tente novamente em alguns minutos.'
-  }
-});
-app.use(limitador);
-
-// Configuração CORS
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
-  credentials: true
+// Helmet para headers de segurança
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ['\'self\''],
+      styleSrc: ['\'self\'', '\'unsafe-inline\''],
+      scriptSrc: ['\'self\''],
+      imgSrc: ['\'self\'', 'data:', 'https:'],
+      connectSrc: ['\'self\'', 'https://accounts.google.com', 'https://oauth2.googleapis.com'],
+      frameSrc: ['\'self\''],
+      objectSrc: ['\'none\''],
+      upgradeInsecureRequests: []
+    }
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
 }));
 
-// Middleware de parsing do corpo da requisição
+// CORS configurado para Flutter
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutos
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limite por IP
+  message: {
+    erro: 'Muitas requisições',
+    mensagem: '�� Muitas requisições deste IP, tente novamente mais tarde'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      erro: 'Rate limit excedido',
+      mensagem: '�� Muitas requisições, tente novamente mais tarde',
+      retryAfter: Math.ceil(process.env.RATE_LIMIT_WINDOW_MS / 1000)
+    });
+  }
+});
+
+app.use('/api/', limiter);
+
+// ===== MIDDLEWARES =====
+
+// Compressão gzip
+app.use(compression());
+
+// Logging
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
+}
+
+// Parsers
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Conexão com banco de dados
-conectarBancoDados();
+// ===== ROTAS =====
 
-// Rotas
-app.use('/api/auth', rotasAuth);
-app.use('/api/habitos', rotasHabitos);
-app.use('/api/usuarios', rotasUsuarios);
-app.use('/api/estatisticas', rotasEstatisticas);
-app.use('/api/loja', rotasLoja);
-app.use('/api/multiplayer', rotasMultiplayer);
-app.use('/api/integracao', rotasIntegracao);
-
-// Endpoint de verificação de saúde
+// Health check simplificado
 app.get('/api/saude', (req, res) => {
   res.json({ 
-    status: 'ativo', 
-    mensagem: '⚔️ O servidor do Librarium está funcionando...',
+    sucesso: true,
+    mensagem: '🗡️ Librarium está funcionando perfeitamente!',
     timestamp: new Date().toISOString(),
-    versao: '1.0.0'
+    versao: '1.0.0',
+    ambiente: process.env.NODE_ENV || 'development',
+    uptime: process.uptime(),
+    funcionalidades: {
+      autenticacao: true,
+      habitos: true,
+      conquistas: true,
+      multiplayer: true,
+      integracoes: true,
+      exportacao: true
+    }
   });
 });
 
-// Middleware de tratamento de erros
-app.use((err, req, res, next) => {
-  console.error('💥 Erro:', err.stack);
-  res.status(500).json({ 
-    erro: 'Algo deu errado nas sombras...',
-    mensagem: process.env.NODE_ENV === 'development' ? err.message : 'Erro interno do servidor'
-  });
+// Rotas da API
+app.use('/api/auth', authRoutes);
+app.use('/api/habitos', habitRoutes);
+app.use('/api/usuarios', userRoutes);
+app.use('/api/estatisticas', statsRoutes);
+app.use('/api/loja', shopRoutes);
+app.use('/api/multiplayer', multiplayerRoutes);
+app.use('/api/integracao', integrationRoutes);
+app.use('/api/conquistas', achievementRoutes);
+app.use('/api/dados', dataRoutes);
+
+// ===== SERVIÇOS DE FUNDO =====
+
+// Inicializar serviços
+async function inicializarServicos() {
+  try {
+    // Verificar conquistas automaticamente (a cada 5 minutos)
+    setInterval(async () => {
+      try {
+        const usuarios = await require('./models/User').find({});
+        for (const usuario of usuarios) {
+          await AchievementService.verificarConquistas(usuario._id);
+        }
+      } catch (erro) {
+        logger.error('Erro ao verificar conquistas automáticas:', erro);
+      }
+    }, 5 * 60 * 1000);
+
+    // Limpeza automática de dados (a cada 24 horas)
+    setInterval(async () => {
+      try {
+        logger.info('🔄 Iniciando limpeza automática de dados...');
+
+        // Limpar conquistas antigas
+        await AchievementService.limparConquistasAntigas(90);
+
+        logger.info('✅ Limpeza automática concluída');
+      } catch (erro) {
+        logger.error('❌ Erro na limpeza automática:', erro);
+      }
+    }, 24 * 60 * 60 * 1000);
+
+    logger.info('✅ Serviços inicializados com sucesso');
+  } catch (erro) {
+    logger.error('❌ Erro ao inicializar serviços:', erro);
+  }
+}
+
+// ===== INICIALIZAÇÃO DO SERVIDOR =====
+
+async function iniciarServidor() {
+  try {
+    // Conectar ao banco de dados
+    await conectarBancoDados();
+
+    // Inicializar serviços
+    await inicializarServicos();
+
+    // Iniciar servidor
+    app.listen(PORT, () => {
+      console.log('╔══════════════════════════════════════════════════════════════╗');
+      console.log('║                    ��️ LIBRARIUM BACKEND                      ║');
+      console.log('╠══════════════════════════════════════════════════════════════╣');
+      console.log('║                                                              ║');
+      console.log('║           ✅ Servidor rodando na porta ' + PORT + '                  ║');
+      console.log('║           ✅ Banco de dados conectado                        ║');
+      console.log('║           ✅ CRUD de Hábitos                                 ║');
+      console.log('║           ✅ Sistema de Conquistas                           ║');
+      console.log('║           ✅ Multiplayer                                     ║');
+      console.log('║           ✅ Integrações Google                              ║');
+      console.log('║           ✅ Exportação/Importação                           ║');
+      console.log('║                                                              ║');
+      console.log('║  �� Health Check: http://localhost:' + PORT + '/api/saude            ║');
+      console.log('║  📚 API Docs: http://localhost:' + PORT + '/api                      ║');
+      console.log('║                                                              ║');
+      console.log('╚══════════════════════════════════════════════════════════════╝');
+    });
+
+  } catch (erro) {
+    console.error('💥 Erro ao iniciar servidor:', erro);
+    process.exit(1);
+  }
+}
+
+// ===== TRATAMENTO DE SINAIS =====
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('🔄 Recebido SIGTERM, encerrando servidor...');
+  
+  try {
+    // Fechar conexões do banco
+    const mongoose = require('mongoose');
+    await mongoose.connection.close();
+    console.log('🗡️ Conexão MongoDB fechada');
+    
+    process.exit(0);
+  } catch (erro) {
+    console.error('💥 Erro durante shutdown:', erro);
+    process.exit(1);
+  }
 });
 
-// Tratador 404
-app.use('*', (req, res) => {
-  res.status(404).json({ 
-    erro: 'Caminho não encontrado',
-    mensagem: '🌑 Este caminho não existe no Librarium...' 
-  });
+process.on('SIGINT', async () => {
+  console.log('🔄 Recebido SIGINT, encerrando servidor...');
+  
+  try {
+    // Fechar conexões do banco
+    const mongoose = require('mongoose');
+    await mongoose.connection.close();
+    console.log('🗡️ Conexão MongoDB fechada');
+    
+    process.exit(0);
+  } catch (erro) {
+    console.error('💥 Erro durante shutdown:', erro);
+    process.exit(1);
+  }
 });
 
-app.listen(PORT, () => {
-  console.log(`🗡️ Servidor do Librarium rodando na porta ${PORT}`);
-  console.log(`🎮 Pronto para a caçada...`);
-  console.log(`📚 Acesse: http://localhost:${PORT}/api/saude`);
-});
+// ===== INICIAR SERVIDOR =====
 
-module.exports = app;
+iniciarServidor();
+
+// ===== MIDDLEWARES DE ERRO =====
+
+// Middleware de erro global
+app.use(errorHandler);
+
+// Middleware para rotas não encontradas (deve ser o último)
+app.use(notFoundHandler);

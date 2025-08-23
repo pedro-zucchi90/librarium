@@ -69,20 +69,20 @@ esquemaConquista.index({ idUsuario: 1, desbloqueadaEm: -1 });
 esquemaConquista.index({ raridade: 1, categoria: 1 });
 
 // Método para verificar se a conquista deve ser desbloqueada
-esquemaConquista.methods.verificarDesbloqueio = function(dadosUsuario) {
+esquemaConquista.methods.verificarDesbloqueio = function (dadosUsuario) {
   const { tipo, valor } = this.condicoes;
-  
+
   switch (tipo) {
-    case 'sequencia':
-      return dadosUsuario.maiorSequencia >= valor;
-    case 'nivel':
-      return dadosUsuario.nivel >= valor;
-    case 'habitos_concluidos':
-      return dadosUsuario.totalHabitosConcluidos >= valor;
-    case 'dias_ativo':
-      return dadosUsuario.diasAtivo >= valor;
-    default:
-      return false;
+  case 'sequencia':
+    return dadosUsuario.maiorSequencia >= valor;
+  case 'nivel':
+    return dadosUsuario.nivel >= valor;
+  case 'habitos_concluidos':
+    return dadosUsuario.totalHabitosConcluidos >= valor;
+  case 'dias_ativo':
+    return dadosUsuario.diasAtivo >= valor;
+  default:
+    return false;
   }
 };
 

@@ -27,7 +27,6 @@ router.get('/sistema', async (req, res) => {
         taxaConclusaoGeral: totalProgressos > 0 ? Math.round((progressosConcluidos / totalProgressos) * 100) : 0
       }
     });
-
   } catch (erro) {
     console.error('Erro ao carregar estatísticas do sistema:', erro);
     res.status(500).json({
@@ -57,7 +56,7 @@ router.get('/grafico-semanal', async (req, res) => {
       const data = new Date(seteDiasAtras);
       data.setDate(seteDiasAtras.getDate() + i);
       const dataString = data.toISOString().split('T')[0];
-      
+
       dadosPorDia[dataString] = {
         data: dataString,
         concluidos: 0,
@@ -90,7 +89,6 @@ router.get('/grafico-semanal', async (req, res) => {
       mensagem: '📊 Gráfico semanal gerado',
       graficoSemanal: Object.values(dadosPorDia)
     });
-
   } catch (erro) {
     console.error('Erro ao gerar gráfico semanal:', erro);
     res.status(500).json({
@@ -131,7 +129,7 @@ router.get('/categorias', async (req, res) => {
 
       estatisticasPorCategoria[categoria].total++;
       estatisticasPorCategoria[categoria].habitos.add(progresso.idHabito.titulo);
-      
+
       if (progresso.status === 'concluido') {
         estatisticasPorCategoria[categoria].concluidos++;
         estatisticasPorCategoria[categoria].experienciaTotal += progresso.experienciaGanha;
@@ -157,7 +155,6 @@ router.get('/categorias', async (req, res) => {
       mensagem: `📈 Estatísticas por categoria (${periodo} dias)`,
       estatisticasCategorias: resultado
     });
-
   } catch (erro) {
     console.error('Erro ao gerar estatísticas por categoria:', erro);
     res.status(500).json({
@@ -172,7 +169,7 @@ router.get('/heatmap', async (req, res) => {
   try {
     const usuario = req.usuario;
     const { ano = new Date().getFullYear() } = req.query;
-    
+
     const inicioAno = new Date(ano, 0, 1);
     const fimAno = new Date(ano, 11, 31, 23, 59, 59);
 
@@ -200,7 +197,7 @@ router.get('/heatmap', async (req, res) => {
     // Calcular níveis de intensidade (0-4)
     const valores = Object.values(atividadesPorDia).map(dia => dia.quantidade);
     const maxAtividades = Math.max(...valores, 1);
-    
+
     const heatmapData = Object.values(atividadesPorDia).map(dia => ({
       ...dia,
       nivel: Math.min(4, Math.ceil((dia.quantidade / maxAtividades) * 4))
@@ -220,7 +217,6 @@ router.get('/heatmap', async (req, res) => {
         }
       }
     });
-
   } catch (erro) {
     console.error('Erro ao gerar heatmap:', erro);
     res.status(500).json({
@@ -271,7 +267,6 @@ router.get('/comparativo-mensal', async (req, res) => {
       mensagem: '📅 Comparativo dos últimos 6 meses',
       comparativoMensal: estatisticasMensais
     });
-
   } catch (erro) {
     console.error('Erro ao gerar comparativo mensal:', erro);
     res.status(500).json({

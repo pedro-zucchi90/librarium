@@ -32,7 +32,6 @@ router.get('/', async (req, res) => {
       mensagem: `🗡️ ${habitos.length} hábitos encontrados`,
       habitos
     });
-
   } catch (erro) {
     console.error('Erro ao listar hábitos:', erro);
     res.status(500).json({
@@ -61,7 +60,6 @@ router.get('/:id', async (req, res) => {
       sucesso: true,
       habito
     });
-
   } catch (erro) {
     console.error('Erro ao obter hábito:', erro);
     res.status(500).json({
@@ -106,7 +104,6 @@ router.post('/', async (req, res) => {
       mensagem: '⚔️ Novo hábito forjado com sucesso!',
       habito: novoHabito
     });
-
   } catch (erro) {
     console.error('Erro ao criar hábito:', erro);
     res.status(500).json({
@@ -163,7 +160,6 @@ router.put('/:id', async (req, res) => {
       mensagem: '🗡️ Hábito aprimorado com sucesso!',
       habito
     });
-
   } catch (erro) {
     console.error('Erro ao atualizar hábito:', erro);
     res.status(500).json({
@@ -196,7 +192,6 @@ router.delete('/:id', async (req, res) => {
       sucesso: true,
       mensagem: '💀 Hábito banido das sombras...'
     });
-
   } catch (erro) {
     console.error('Erro ao deletar hábito:', erro);
     res.status(500).json({
@@ -211,7 +206,7 @@ router.post('/:id/concluir', async (req, res) => {
   try {
     const { observacoes, data } = req.body;
     const dataProgresso = data ? new Date(data) : new Date();
-    
+
     // Normalizar data para início do dia
     dataProgresso.setHours(0, 0, 0, 0);
 
@@ -269,7 +264,6 @@ router.post('/:id/concluir', async (req, res) => {
       experienciaGanha: habito.recompensaExperiencia,
       novoNivel: req.usuario.nivel
     });
-
   } catch (erro) {
     console.error('Erro ao concluir hábito:', erro);
     res.status(500).json({
@@ -292,7 +286,7 @@ router.get('/:id/progresso', async (req, res) => {
     }
 
     let query = Progresso.find(filtros).sort({ data: -1 });
-    
+
     if (limite) {
       query = query.limit(parseInt(limite));
     }
@@ -304,7 +298,6 @@ router.get('/:id/progresso', async (req, res) => {
       mensagem: `📊 ${progressos.length} registros de progresso encontrados`,
       progressos
     });
-
   } catch (erro) {
     console.error('Erro ao obter progresso:', erro);
     res.status(500).json({
