@@ -21,7 +21,7 @@ dependencies:
   path: ^1.8.3
   
   # Armazenamento local
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.3.2
   
   # HTTP e API
   http: ^1.1.0
@@ -29,9 +29,6 @@ dependencies:
   # Utilitários
   intl: ^0.18.1
   uuid: ^4.0.0
-  
-  # Notificações
-  flutter_local_notifications: ^16.3.0
   
   # Ícones
   flutter_svg: ^2.0.9

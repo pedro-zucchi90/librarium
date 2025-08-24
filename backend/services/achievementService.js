@@ -71,6 +71,31 @@ class AchievementService {
         return resultado >= valor;
       }
 
+      case 'habitos_diferentes': {
+        const resultado = await this.verificarHabitosDiferentes(usuario, valor, periodo);
+        return resultado >= valor;
+      }
+
+      case 'eficiencia_semanal': {
+        const resultado = await this.verificarEficienciaSemanal(usuario, valor);
+        return resultado >= valor;
+      }
+
+      case 'consistencia_mensal': {
+        const resultado = await this.verificarConsistenciaMensal(usuario, valor);
+        return resultado >= valor;
+      }
+
+      case 'habitos_rapidos': {
+        const resultado = await this.verificarHabitosRapidos(usuario, valor, periodo);
+        return resultado >= valor;
+      }
+
+      case 'variedade_categorias': {
+        const resultado = await this.verificarVariedadeCategorias(usuario, valor);
+        return resultado >= valor;
+      }
+
       default:
         return false;
       }
@@ -231,6 +256,163 @@ class AchievementService {
       return diasPerfeitos.length >= valor;
     } catch (erro) {
       console.error('Erro ao verificar sequência perfeita:', erro);
+      return false;
+    }
+  }
+
+  // Verificar hábitos diferentes completados
+  static async verificarHabitosDiferentes(usuario, valor, periodo) {
+    try {
+      const dataInicio = this.calcularDataInicio(periodo);
+
+      const habitosDiferentes = await Progresso.distinct('idHabito', {
+        idUsuario: usuario._id,
+        data: { $gte: dataInicio },
+        status: 'concluido'
+      });
+
+      return habitosDiferentes.length >= valor;
+    } catch (erro) {
+      console.error('Erro ao verificar hábitos diferentes:', erro);
+      return false;
+    }
+  }
+
+  // Verificar eficiência semanal (porcentagem de hábitos concluídos)
+  static async verificarEficienciaSemanal(usuario, valor) {
+    try {
+      const dataInicio = this.calcularDataInicio('semanal');
+      const dataFim = new Date();
+
+      // Buscar todos os hábitos ativos na semana
+      const habitosAtivos = await Habito.countDocuments({
+        idUsuario: usuario._id,
+        ativo: true
+      });
+
+      if (habitosAtivos === 0) return 0;
+
+      // Buscar hábitos concluídos na semana
+      const habitosConcluidos = await Progresso.countDocuments({
+        idUsuario: usuario._id,
+        data: { $gte: dataInicio, $lte: dataFim },
+        status: 'concluido'
+      });
+
+      // Calcular eficiência (hábitos concluídos / total de hábitos * 7 dias)
+      const eficiencia = (habitosConcluidos / (habitosAtivos * 7)) * 100;
+      return Math.round(eficiencia);
+    } catch (erro) {
+      console.error('Erro ao verificar eficiência semanal:', erro);
+      return 0;
+    }
+  }
+
+  // Verificar consistência mensal (dias com pelo menos um hábito)
+  static async verificarConsistenciaMensal(usuario, valor) {
+    try {
+      const dataInicio = this.calcularDataInicio('mensal');
+      const dataFim = new Date();
+
+      const diasComHabitos = await Progresso.distinct('data', {
+        idUsuario: usuario._id,
+        data: { $gte: dataInicio, $lte: dataFim },
+        status: 'concluido'
+      });
+
+      const totalDias = Math.ceil((dataFim - dataInicio) / (1000 * 60 * 60 * 24));
+      const consistencia = (diasComHabitos.length / totalDias) * 100;
+
+      return Math.round(consistencia);
+    } catch (erro) {
+      console.error('Erro ao verificar consistência mensal:', erro);
+      return 0;
+    }
+  }
+
+  // Verificar hábitos rápidos (concluídos no mesmo dia)
+  static async verificarHabitosRapidos(usuario, valor, periodo) {
+    try {
+      const dataInicio = this.calcularDataInicio(periodo);
+
+      const habitosRapidos = await Progresso.aggregate([
+        {
+          $match: {
+            idUsuario: usuario._id,
+            data: { $gte: dataInicio },
+            status: 'concluido'
+          }
+        },
+        {
+          $lookup: {
+            from: 'habitos',
+            localField: 'idHabito',
+            foreignField: '_id',
+            as: 'habito'
+          }
+        },
+        {
+          $unwind: '$habito'
+        },
+        {
+          $match: {
+            'habito.frequencia': 'diario'
+          }
+        },
+        {
+          $group: {
+            _id: '$data',
+            habitosConcluidos: { $sum: 1 }
+          }
+        },
+        {
+          $match: {
+            habitosConcluidos: { $gte: valor }
+          }
+        }
+      ]);
+
+      return habitosRapidos.length;
+    } catch (erro) {
+      console.error('Erro ao verificar hábitos rápidos:', erro);
+      return 0;
+    }
+  }
+
+  // Verificar variedade de categorias
+  static async verificarVariedadeCategorias(usuario, valor) {
+    try {
+      const dataInicio = this.calcularDataInicio('total');
+
+      const categorias = await Progresso.aggregate([
+        {
+          $match: {
+            idUsuario: usuario._id,
+            data: { $gte: dataInicio },
+            status: 'concluido'
+          }
+        },
+        {
+          $lookup: {
+            from: 'habitos',
+            localField: 'idHabito',
+            foreignField: '_id',
+            as: 'habito'
+          }
+        },
+        {
+          $unwind: '$habito'
+        },
+        {
+          $group: {
+            _id: '$habito.categoria'
+          }
+        }
+      ]);
+
+      return categorias.length >= valor;
+    } catch (erro) {
+      console.error('Erro ao verificar variedade de categorias:', erro);
       return false;
     }
   }
@@ -436,6 +618,135 @@ class AchievementService {
           condicoes: {
             tipo: 'sequencia_perfeita',
             valor: 5,
+            periodo: 'total'
+          }
+        },
+        // Novas conquistas
+        {
+          idUsuario: usuarioId,
+          titulo: 'Explorador',
+          descricao: 'Complete hábitos de 5 categorias diferentes',
+          tipo: 'variedade_categorias',
+          categoria: 'progresso',
+          icone: 'mapa',
+          cor: '#8B5CF6',
+          experienciaRecompensa: 150,
+          raridade: 'raro',
+          condicoes: {
+            tipo: 'variedade_categorias',
+            valor: 5,
+            periodo: 'total'
+          }
+        },
+        {
+          idUsuario: usuarioId,
+          titulo: 'Eficiência Semanal',
+          descricao: 'Mantenha 80% de eficiência por uma semana',
+          tipo: 'eficiencia_semanal',
+          categoria: 'tempo',
+          icone: 'relogio',
+          cor: '#10B981',
+          experienciaRecompensa: 200,
+          raridade: 'raro',
+          condicoes: {
+            tipo: 'eficiencia_semanal',
+            valor: 80,
+            periodo: 'semanal'
+          }
+        },
+        {
+          idUsuario: usuarioId,
+          titulo: 'Consistência Mensal',
+          descricao: 'Mantenha 70% de consistência por um mês',
+          tipo: 'consistencia_mensal',
+          categoria: 'tempo',
+          icone: 'calendario_mensal',
+          cor: '#F59E0B',
+          experienciaRecompensa: 300,
+          raridade: 'epico',
+          condicoes: {
+            tipo: 'consistencia_mensal',
+            valor: 70,
+            periodo: 'mensal'
+          }
+        },
+        {
+          idUsuario: usuarioId,
+          titulo: 'Velocista',
+          descricao: 'Complete 3 hábitos diários em 5 dias diferentes',
+          tipo: 'habitos_rapidos',
+          categoria: 'tempo',
+          icone: 'raio',
+          cor: '#EF4444',
+          experienciaRecompensa: 250,
+          raridade: 'raro',
+          condicoes: {
+            tipo: 'habitos_rapidos',
+            valor: 5,
+            periodo: 'semanal'
+          }
+        },
+        {
+          idUsuario: usuarioId,
+          titulo: 'Mestre da Variedade',
+          descricao: 'Complete hábitos de 8 categorias diferentes',
+          tipo: 'variedade_categorias',
+          categoria: 'progresso',
+          icone: 'paleta',
+          cor: '#06B6D4',
+          experienciaRecompensa: 400,
+          raridade: 'epico',
+          condicoes: {
+            tipo: 'variedade_categorias',
+            valor: 8,
+            periodo: 'total'
+          }
+        },
+        {
+          idUsuario: usuarioId,
+          titulo: 'Lenda da Persistência',
+          descricao: 'Complete hábitos por 100 dias consecutivos',
+          tipo: 'sequencia_100_dias',
+          categoria: 'tempo',
+          icone: 'coroa_lendaria',
+          cor: '#F59E0B',
+          experienciaRecompensa: 1000,
+          raridade: 'lendario',
+          condicoes: {
+            tipo: 'sequencia',
+            valor: 100,
+            periodo: 'total'
+          }
+        },
+        {
+          idUsuario: usuarioId,
+          titulo: 'Imperador dos Hábitos',
+          descricao: 'Complete todos os hábitos do dia por 30 dias',
+          tipo: 'sequencia_perfeita_30',
+          categoria: 'tempo',
+          icone: 'imperio',
+          cor: '#DC2626',
+          experienciaRecompensa: 1500,
+          raridade: 'lendario',
+          condicoes: {
+            tipo: 'sequencia_perfeita',
+            valor: 30,
+            periodo: 'total'
+          }
+        },
+        {
+          idUsuario: usuarioId,
+          titulo: 'Sábio do Conhecimento',
+          descricao: 'Alcance 10.000 XP total',
+          tipo: 'xp_10000',
+          categoria: 'nivel',
+          icone: 'livro_sabedoria',
+          cor: '#7C3AED',
+          experienciaRecompensa: 800,
+          raridade: 'epico',
+          condicoes: {
+            tipo: 'xp_total',
+            valor: 10000,
             periodo: 'total'
           }
         }

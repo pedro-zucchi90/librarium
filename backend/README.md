@@ -251,16 +251,45 @@ curl -X POST http://localhost:3000/api/auth/login \
 - [x] Progresso e estatísticas básicas
 
 ### Versão Intermediária 🔄
-- [ ] Sistema de conquistas automáticas
-- [ ] Notificações (via webhook/email)
-- [ ] Avatar evolutivo visual
-- [ ] Exportação de dados
+- [x] Sistema de conquistas automáticas
+- [x] Avatar evolutivo visual
+- [x] Exportação de dados
+- [ ] Notificações (via webhook/email) - **Pausado**
 
 ### Versão Avançada 🎯
 - [ ] Ranking multiplayer
 - [ ] Sistema de batalhas de hábitos
 - [ ] Integração com calendários
 - [ ] Modo offline-first
+
+### 🆕 Funcionalidades Implementadas
+
+#### Sistema de Conquistas Avançado 🏆
+- **25+ tipos de conquistas** com verificação automática
+- **Sistema de raridade**: Comum, Raro, Épico, Lendário
+- **Verificações inteligentes**: Sequências, eficiência, consistência
+- **Recompensas de XP** baseadas na dificuldade
+- **Conquistas personalizadas** criadas pelos usuários
+
+#### Avatar Evolutivo Visual 🎭
+- **6 níveis de evolução** baseados em XP e conquistas
+- **Sistema de equipamentos** com desbloqueios automáticos
+- **Efeitos visuais**: Auras, partículas e temas dinâmicos
+- **Personalização avançada** de armas, armaduras e acessórios
+- **Evolução automática** a cada 5 minutos
+
+#### Sistema de Exportação de Dados 📊
+- **Múltiplos formatos**: JSON, XML, ZIP
+- **Backup automático** antes de importações
+- **Validação de dados** e tratamento de erros
+- **Estatísticas detalhadas** de exportação
+- **Importação com opções** de mesclagem e sobrescrita
+
+### 🔄 Verificação Automática
+O sistema agora verifica automaticamente:
+- **Conquistas** a cada 5 minutos
+- **Evolução do avatar** a cada 5 minutos
+- **Limpeza de dados** a cada 24 horas
 
 ## 🐛 Logs e Debug
 

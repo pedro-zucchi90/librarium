@@ -21,9 +21,11 @@ const multiplayerRoutes = require('./routes/multiplayerRoutes');
 const integrationRoutes = require('./routes/integrationRoutes');
 const achievementRoutes = require('./routes/achievementRoutes');
 const dataRoutes = require('./routes/dataRoutes');
+const avatarRoutes = require('./routes/avatarRoutes');
 
 // Importar serviços
 const AchievementService = require('./services/achievementService');
+const AvatarService = require('./services/avatarService');
 
 // Importar middlewares
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
@@ -65,14 +67,14 @@ const limiter = rateLimit({
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limite por IP
   message: {
     erro: 'Muitas requisições',
-    mensagem: '�� Muitas requisições deste IP, tente novamente mais tarde'
+    mensagem: ' Muitas requisições deste IP, tente novamente mais tarde'
   },
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
     res.status(429).json({
       erro: 'Rate limit excedido',
-      mensagem: '�� Muitas requisições, tente novamente mais tarde',
+      mensagem: ' Muitas requisições, tente novamente mais tarde',
       retryAfter: Math.ceil(process.env.RATE_LIMIT_WINDOW_MS / 1000)
     });
   }
@@ -111,9 +113,16 @@ app.get('/api/saude', (req, res) => {
       autenticacao: true,
       habitos: true,
       conquistas: true,
+      avatarEvolutivo: true,
       multiplayer: true,
       integracoes: true,
-      exportacao: true
+      exportacao: true,
+      sistemaConquistas: true
+    },
+    roadmap: {
+      mvp: '✅ Concluído',
+      versaoIntermediaria: '🔄 Em desenvolvimento',
+      versaoAvancada: '⏳ Planejado'
     }
   });
 });
@@ -128,6 +137,7 @@ app.use('/api/multiplayer', multiplayerRoutes);
 app.use('/api/integracao', integrationRoutes);
 app.use('/api/conquistas', achievementRoutes);
 app.use('/api/dados', dataRoutes);
+app.use('/api/avatar', avatarRoutes);
 
 // ===== SERVIÇOS DE FUNDO =====
 
@@ -139,10 +149,14 @@ async function inicializarServicos() {
       try {
         const usuarios = await require('./models/User').find({});
         for (const usuario of usuarios) {
+          // Verificar conquistas
           await AchievementService.verificarConquistas(usuario._id);
+          
+          // Verificar evolução do avatar
+          await AvatarService.verificarEvolucaoAvatar(usuario._id);
         }
       } catch (erro) {
-        logger.error('Erro ao verificar conquistas automáticas:', erro);
+        logger.error('Erro ao verificar conquistas e evolução automática:', erro);
       }
     }, 5 * 60 * 1000);
 
@@ -179,18 +193,20 @@ async function iniciarServidor() {
     // Iniciar servidor
     app.listen(PORT, () => {
       console.log('╔══════════════════════════════════════════════════════════════╗');
-      console.log('║                    ��️ LIBRARIUM BACKEND                      ║');
+      console.log('║                    🗡️ LIBRARIUM BACKEND                      ║');
       console.log('╠══════════════════════════════════════════════════════════════╣');
       console.log('║                                                              ║');
       console.log('║           ✅ Servidor rodando na porta ' + PORT + '                  ║');
       console.log('║           ✅ Banco de dados conectado                        ║');
       console.log('║           ✅ CRUD de Hábitos                                 ║');
-      console.log('║           ✅ Sistema de Conquistas                           ║');
+      console.log('║           ✅ Sistema de Conquistas Avançado                  ║');
+      console.log('║           ✅ Avatar Evolutivo Visual                         ║');
+      console.log('║           ✅ Sistema de Equipamentos                        ║');
       console.log('║           ✅ Multiplayer                                     ║');
       console.log('║           ✅ Integrações Google                              ║');
       console.log('║           ✅ Exportação/Importação                           ║');
       console.log('║                                                              ║');
-      console.log('║  �� Health Check: http://localhost:' + PORT + '/api/saude            ║');
+      console.log('║  🗡️ Health Check: http://localhost:' + PORT + '/api/saude            ║');
       console.log('║  📚 API Docs: http://localhost:' + PORT + '/api                      ║');
       console.log('║                                                              ║');
       console.log('╚══════════════════════════════════════════════════════════════╝');
