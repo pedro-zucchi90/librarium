@@ -193,7 +193,7 @@ async function iniciarServidor() {
     // Iniciar servidor
     app.listen(PORT, () => {
       console.log('╔══════════════════════════════════════════════════════════════╗');
-      console.log('║                    🗡️ LIBRARIUM BACKEND                      ║');
+      console.log('║                    🗡️ LIBRARIUM BACKEND                       ║');
       console.log('╠══════════════════════════════════════════════════════════════╣');
       console.log('║                                                              ║');
       console.log('║           ✅ Servidor rodando na porta ' + PORT + '                  ║');
@@ -201,12 +201,12 @@ async function iniciarServidor() {
       console.log('║           ✅ CRUD de Hábitos                                 ║');
       console.log('║           ✅ Sistema de Conquistas Avançado                  ║');
       console.log('║           ✅ Avatar Evolutivo Visual                         ║');
-      console.log('║           ✅ Sistema de Equipamentos                        ║');
+      console.log('║           ✅ Sistema de Equipamentos                         ║');
       console.log('║           ✅ Multiplayer                                     ║');
       console.log('║           ✅ Integrações Google                              ║');
       console.log('║           ✅ Exportação/Importação                           ║');
       console.log('║                                                              ║');
-      console.log('║  🗡️ Health Check: http://localhost:' + PORT + '/api/saude            ║');
+      console.log('║  🗡️ Health Check: http://localhost:' + PORT + '/api/saude             ║');
       console.log('║  📚 API Docs: http://localhost:' + PORT + '/api                      ║');
       console.log('║                                                              ║');
       console.log('╚══════════════════════════════════════════════════════════════╝');

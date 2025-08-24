@@ -246,8 +246,8 @@ router.get('/batalha', async (req, res) => {
       ]
     };
 
-    if (status) filtros.status = status;
-    if (tipo) filtros.tipoBatalha = tipo;
+    if (status) {filtros.status = status};
+    if (tipo) {filtros.tipoBatalha = tipo};
 
     const batalhas = await Batalha.find(filtros)
       .populate('jogador1', 'nomeUsuario avatar nivel')
@@ -410,8 +410,8 @@ router.get('/desafio', async (req, res) => {
       ]
     };
 
-    if (status) filtros.status = status;
-    if (tipo) filtros.tipoDesafio = tipo;
+    if (status) {filtros.status = status};
+    if (tipo) {filtros.tipoDesafio = tipo};
 
     const desafios = await Desafio.find(filtros)
       .populate('remetente', 'nomeUsuario avatar nivel')
