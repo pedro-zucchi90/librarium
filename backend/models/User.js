@@ -158,7 +158,7 @@ esquemaUsuario.methods.migrarAvatarAntigo = function() {
 
 // Método para atualizar avatar baseado no nível
 esquemaUsuario.methods.atualizarAvatarPorNivel = function() {
-  const nivel = this.nivel;
+  const {nivel} = this;
   
   if (nivel >= 50) {
     this.avatar.tipo = 'conjurador_supremo';

@@ -10,7 +10,7 @@ class AchievementService {
   static async verificarConquistas (usuarioId) {
     try {
       const usuario = await Usuario.findById(usuarioId);
-      if (!usuario) return [];
+      if (!usuario) {return []};
 
       const conquistasDesbloqueadas = [];
 
@@ -116,7 +116,7 @@ class AchievementService {
         status: 'concluido'
       }).sort({ data: 1 });
 
-      if (progressos.length === 0) return false;
+      if (progressos.length === 0) {return false};
 
       let sequenciaAtual = 1;
       let maiorSequencia = 1;
@@ -229,7 +229,7 @@ class AchievementService {
         ativo: true
       });
 
-      if (habitosAtivos === 0) return false;
+      if (habitosAtivos === 0) {return false};
 
       // Buscar dias com todos os hábitos concluídos
       const diasPerfeitos = await Progresso.aggregate([
@@ -290,7 +290,7 @@ class AchievementService {
         ativo: true
       });
 
-      if (habitosAtivos === 0) return 0;
+      if (habitosAtivos === 0) {return 0};
 
       // Buscar hábitos concluídos na semana
       const habitosConcluidos = await Progresso.countDocuments({
@@ -483,9 +483,9 @@ class AchievementService {
 
   // Obter título baseado no nível
   static obterTituloPorNivel (nivel) {
-    if (nivel >= 31) return 'Conjurador Supremo';
-    if (nivel >= 21) return 'Guardião do Librarium';
-    if (nivel >= 11) return 'Caçador';
+    if (nivel >= 31) {return 'Conjurador Supremo'};
+    if (nivel >= 21) {return 'Guardião do Librarium'};
+    if (nivel >= 11) {return 'Caçador'};
     return 'Aspirante';
   }
 
